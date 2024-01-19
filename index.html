@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMA1</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="main_container">
+        <section class="our_products">
+            <p class="title">Our Products</p>
+            <section class="product_grid" id="allProducts">
+
+            </section>
+        </section>
+
+        <section class="product_filter">
+            <input type="number" class="filter" placeholder="Enter a price">
+            <div class="product_filter_row">
+                <select>
+                    <option value="">Sort By</option>
+                    <option value="A">Accending</option>
+                    <option value="D">Deccending</option>
+                </select>
+                <div class="clear_cart_btn">
+                    <span onclick="clearCart()">Clear Cart <i class="fas fa-times"></i></span>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="product_cart our_products">
+            <p class="title">Cart</p>
+            <section class="product_grid" id="allCartProducts">
+            </section>
+        </section>
+
+        <section class="cart_summary our_products">
+            <p class="title">Cart Summary </p>
+            <div class="price_summary_row average_price_row">
+                <p>Average Product Price</p>
+                <p>$<span id="average_price">1234.00</span></p>
+            </div>
+
+            <div class="price_summary_row total_price_row">
+                <p>Total</p>
+                <p>$<span id="total_price">1234.00</span></p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let data = {
+
+            "products":
+                [
+                    {
+                        "id": 1,
+                        "name": "Library Stool Chair",
+                        "image": "images/img1.png",
+                        "price": "$5",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 2,
+                        "name": "Library Stool Chair",
+                        "image": "images/img2.png",
+                        "price": "$10",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 3,
+                        "name": "Library Stool Chair",
+                        "image": "images/img3.png",
+                        "price": "$25",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 4,
+                        "name": "Library Stool Chair",
+                        "image": "images/img4.png",
+                        "price": "$32",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 5,
+                        "name": "Library Stool Chair",
+                        "image": "images/img5.png",
+                        "price": "$58",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 6,
+                        "name": "Library Stool Chair",
+                        "image": "images/img6.png",
+                        "price": "$97",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 7,
+                        "name": "Library Stool Chair",
+                        "image": "images/img7.png",
+                        "price": "$120",
+                        "quantity": 0
+                    },
+                    {
+                        "id": 8,
+                        "name": "Library Stool Chair",
+                        "image": "images/img8.png",
+                        "price": "$167",
+                        "quantity": 0
+                    }
+
+
+                ]
+        };
+
+        let cart = {
+            "products": []
+        }
+
+
+
+
+
+        function GetProducts() {
+
+            if (cart.products == []) {
+                console.log("no product");
+                return
+            }
+
+            let allProduct = '';
+
+            data.products.forEach((product) => {
+                allProduct += `<div class="box">
+                <img src="${product.image}" alt="">
+                <div class="product_info">
+                    <div class="text_info">
+                        <p class="product_title">
+                            ${product.name} <!-- Fix: Use product.name instead of product.title -->
+                        </p>
+                        <p class="product_price">
+                            ${product.price}
+                        </p>
+                    </div>
+                    <span class="icon">
+                        <i class="fas fa-cart-plus" onclick="addToCart(${product.id})"></i>
+                    </span>
+                </div>
+            </div>`;
+                //document.querySelector('.product_grid').innerHTML(product)
+
+            });
+
+            document.querySelector('#allProducts').innerHTML = allProduct;
+        }
+
+        GetProducts();
+
+
+        function GetCartProducts() {
+            let allProduct = '';
+
+            cart.products.forEach((product) => {
+                allProduct += `<div class="box">
+                    <img src="${product.image}" alt="">
+                    <div class="product_info">
+                        <div class="text_info">
+                            <p class="product_title">
+                                ${product.name} <!-- Fix: Use product.name instead of product.title -->
+                            </p>
+                            <p class="product_price">
+                                ${product.price}
+                            </p>
+                        </div>
+                        <span>${product.quantity}</span>
+                        <span class="icon">
+                            <i class="fas fa-times" onclick="removeFromCart(${product.id})"></i>
+                        </span>
+                    </div>
+                </div>`;
+
+            });
+
+            document.querySelector('#allCartProducts').innerHTML = allProduct;
+        }
+
+        GetCartProducts();
+
+
+
+        function addToCart(productId) {
+            // Find the product in the data.products array based on the productId
+            const selectedProduct = data.products.find(product => product.id === productId);
+
+            // Check if the product is found
+            if (selectedProduct) {
+                // Check if the product is already in the cart
+                const existingProduct = cart.products.find(product => product.id === productId);
+
+                if (existingProduct) {
+                    // If the product is already in the cart, increment its quantity
+                    existingProduct.quantity++;
+                } else {
+                    // If the product is not in the cart, add it with quantity 1
+                    cart.products.push({
+                        id: selectedProduct.id,
+                        name: selectedProduct.name,
+                        image: selectedProduct.image,
+                        price: selectedProduct.price,
+                        quantity: 1
+                    });
+                }
+
+                // Update the cart display
+                GetCartProducts();
+                calculateAveragePrice();
+                calculateTotalPrice();
+            } else {
+                console.log(`Product with ID ${productId} not found.`);
+            }
+        }
+
+
+        function removeFromCart(productId) {
+            // Find the product in the cart based on the productId
+            const productIndex = cart.products.findIndex(product => product.id === productId);
+
+            // Check if the product is in the cart
+            if (productIndex !== -1) {
+                const existingProduct = cart.products[productIndex];
+
+                // Decrease the quantity by 1, but ensure it doesn't go below 0
+                existingProduct.quantity = Math.max(existingProduct.quantity - 1, 0);
+
+                // If the quantity is 0, remove the product from the cart
+                if (existingProduct.quantity === 0) {
+                    cart.products.splice(productIndex, 1);
+                }
+
+                // Update the cart display
+                GetCartProducts();
+                calculateAveragePrice();
+                calculateTotalPrice();
+            } else {
+                console.log(`Product with ID ${productId} not found in the cart.`);
+            }
+        }
+
+
+
+        //calculate average price 
+
+        function calculateAveragePrice() {
+            // Check if the cart is not empty
+            if (cart.products.length > 0) {
+                // Calculate the total price and total quantity
+                const totalAmount = cart.products.reduce((total, product) => {
+                    const price = parseFloat(product.price.replace('$', '')); // Remove the '$' and parse as float
+                    return total + price * product.quantity;
+                }, 0);
+
+                const totalQuantity = cart.products.reduce((total, product) => total + product.quantity, 0);
+
+                // Calculate the average price
+                const averagePrice = totalAmount / totalQuantity;
+
+                // Display the average price in the HTML
+                const averagePriceElement = document.getElementById('average_price');
+                averagePriceElement.textContent = averagePrice.toFixed(2); // Display up to two decimal places
+            } else {
+                // If the cart is empty, set the average price to 0
+                const averagePriceElement = document.getElementById('average_price');
+                averagePriceElement.textContent = '0.00';
+            }
+        }
+
+
+        //calculate total price 
+        function calculateTotalPrice() {
+            // Check if the cart is not empty
+            if (cart.products.length > 0) {
+                // Calculate the total price
+                const totalPrice = cart.products.reduce((total, product) => {
+                    const price = parseFloat(product.price.replace('$', '')); // Remove the '$' and parse as float
+                    return total + price * product.quantity;
+                }, 0);
+
+                // Display the total price in the HTML
+                const totalPriceElement = document.getElementById('total_price');
+                totalPriceElement.textContent = totalPrice.toFixed(2); // Display up to two decimal places
+            } else {
+                // If the cart is empty, set the total price to 0
+                const totalPriceElement = document.getElementById('total_price');
+                totalPriceElement.textContent = '0.00';
+            }
+        }
+
+
+        //clearCart 
+        function clearCart() {
+                cart = {
+                "products": []
+            }
+            GetCartProducts();
+            calculateAveragePrice();
+            calculateTotalPrice();
+          }
+
+    </script>
+</body>
+
+</html>
